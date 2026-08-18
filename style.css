@@ -34,3 +34,5 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:0 15px calc(1
   :root{--bg:#0b0d10;--card:#15181d;--text:#f9fafb;--muted:#9ca3af;--line:#282d34;--accent:#f9fafb;--accentText:#111827}
   input,select{background:#fff;color:#000}.menu-icon,.badge{background:#20242a}.topbar{background:rgba(11,13,16,.88)}
 }
+
+.coord-line{display:flex;align-items:center;gap:24px;flex-wrap:wrap;font-size:17px}

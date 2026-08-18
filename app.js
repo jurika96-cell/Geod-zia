@@ -11,7 +11,7 @@ const parseN = v => {
 };
 const fmt = (v,d=3) => Number(v).toLocaleString("hu-HU",{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false});
 const cross = (a,b) => a.x*b.y-a.y*b.x;
-const vecFromMil = d => ({x:Math.sin(rad(d)), y:Math.cos(rad(d))});
+const vecFromMil = d => ({x:Math.cos(rad(d)), y:Math.sin(rad(d))});
 
 const titles = {
   home:["Geodézia","6400 MILS"],
@@ -51,7 +51,7 @@ $('[data-calc="reverse"]').addEventListener("submit",e=>{
     const v=values(e.target), ax=parseN(v.ax), ay=parseN(v.ay), bx=parseN(v.bx), by=parseN(v.by);
     const dx=bx-ax, dy=by-ay, d=Math.hypot(dx,dy);
     if(d<1e-12) throw new Error("A két pont nem lehet azonos.");
-    const dir=mil(Math.atan2(dx,dy));
+    const dir=mil(Math.atan2(dy,dx));
     resultBox("reverse",`<h3>Eredmény</h3>${grid([["Távolság",fmt(d)+" m"],["Irányszög",fmt(dir,2)+" MIL"]])}`);
   }catch(err){resultBox("reverse",err.message,true)}
 });
@@ -74,7 +74,7 @@ $('[data-calc="direct"]').addEventListener("submit",e=>{
       ? `<p class="hint">A megadott irányszög automatikusan 3200 MIL-lel meg lett fordítva: ${fmt(dir,2)} MIL.</p>`
       : "";
 
-    resultBox("direct",`<h3>${title}</h3>${grid([["Y",fmt(py)],["X",fmt(px)]])}${extra}`);
+    resultBox("direct",`<h3>${title}</h3><div class="coord-line"><strong>Y ${fmt(py)}</strong><strong>X ${fmt(px)}</strong></div>${extra}`);
   }catch(err){resultBox("direct",err.message,true)}
 });
 
