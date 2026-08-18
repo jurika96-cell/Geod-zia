@@ -1,4 +1,3 @@
-
 const FULL = 6400;
 const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => [...el.querySelectorAll(s)];
@@ -17,7 +16,7 @@ const vecFromMil = d => ({x:Math.sin(rad(d)), y:Math.cos(rad(d))});
 const titles = {
   home:["Geodézia","6400 MILS"],
   reverse:["Fordított geodéziai feladat","Két koordináta → irányszög és távolság"],
-  direct:["Egyszerű geodéziai feladat","Álláspont + irányszög + távolság"],
+  direct:["Egyszerű geodéziai feladat","Ismert pont + irányszög + távolság"],
   oriented:["Kétpontos tájolt metszés","Két ismert pont + két abszolút irány"],
   arc:["Ívmetszés","Két ismert pont + két távolság"],
   tienstra:["Hárompontos metszés","Tienstra-féle megoldás"]
@@ -61,11 +60,21 @@ $('[data-calc="reverse"]').addEventListener("submit",e=>{
 $('[data-calc="direct"]').addEventListener("submit",e=>{
   e.preventDefault();
   try{
-    const v=values(e.target), x=parseN(v.x), y=parseN(v.y), dir=parseN(v.dir), d=parseN(v.dist);
+    const v=values(e.target), x=parseN(v.x), y=parseN(v.y), rawDir=parseN(v.dir), d=parseN(v.dist);
     if(d<0) throw new Error("A távolság nem lehet negatív.");
-    const u=vecFromMil(normMil(dir));
+
+    const measureType = v.measureType || "target";
+    const dir = measureType === "known" ? normMil(rawDir + 3200) : normMil(rawDir);
+
+    const u=vecFromMil(dir);
     const px=x+d*u.x, py=y+d*u.y;
-    resultBox("direct",`<h3>Cél koordinátái</h3>${grid([["X",fmt(px)],["Y",fmt(py)]])}`);
+
+    const title = measureType === "known" ? "Álláspont koordinátái" : "Cél koordinátái";
+    const extra = measureType === "known"
+      ? `<p class="hint">A megadott irányszög automatikusan 3200 MIL-lel meg lett fordítva: ${fmt(dir,2)} MIL.</p>`
+      : "";
+
+    resultBox("direct",`<h3>${title}</h3>${grid([["Y",fmt(py)],["X",fmt(px)]])}${extra}`);
   }catch(err){resultBox("direct",err.message,true)}
 });
 
@@ -76,7 +85,6 @@ $('[data-calc="oriented"]').addEventListener("submit",e=>{
     const v=values(e.target);
     const A={x:parseN(v.ax),y:parseN(v.ay)}, B={x:parseN(v.bx),y:parseN(v.by)};
     const pToA=parseN(v.dirA), pToB=parseN(v.dirB);
-    // A->P és B->P a mért P->A / P->B irányok 3200 MIL-es megfordítása.
     const u=vecFromMil(normMil(pToA+3200));
     const w=vecFromMil(normMil(pToB+3200));
     const den=cross(u,w);
@@ -114,8 +122,7 @@ $('[data-calc="arc"]').addEventListener("submit",e=>{
   }catch(err){resultBox("arc",err.message,true)}
 });
 
-// segédek Tienstrához
-function angleAt(A,B,C){ // ∠BAC, 0..pi
+function angleAt(A,B,C){
   const u={x:B.x-A.x,y:B.y-A.y}, v={x:C.x-A.x,y:C.y-A.y};
   const nu=Math.hypot(u.x,u.y), nv=Math.hypot(v.x,v.y);
   if(nu<1e-12||nv<1e-12) throw new Error("Az ismert pontok között van azonos pont.");
@@ -134,7 +141,6 @@ $('[data-calc="tienstra"]').addEventListener("submit",e=>{
     const alpha=rad(parseN(v.alpha)), beta=rad(parseN(v.beta)), gamma=rad(parseN(v.gamma));
     if(alpha<=0||beta<=0||gamma<=0) throw new Error("A mért szögeknek pozitívnak kell lenniük.");
 
-    // Kontrollháromszög belső szögei:
     const Aang=angleAt(A,B,C);
     const Bang=angleAt(B,C,A);
     const Cang=angleAt(C,A,B);
