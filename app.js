@@ -11,6 +11,10 @@ const parseN = v => {
 };
 const fmt = (v,d=3) => Number(v).toLocaleString("hu-HU",{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false});
 const cross = (a,b) => a.x*b.y-a.y*b.x;
+
+// Geodéziai tengelykonvenció:
+// 0 MIL = +X (észak/felfelé)
+// 1600 MIL = +Y (kelet/jobbra)
 const vecFromMil = d => ({x:Math.cos(rad(d)), y:Math.sin(rad(d))});
 
 const titles = {
@@ -60,21 +64,38 @@ $('[data-calc="reverse"]').addEventListener("submit",e=>{
 $('[data-calc="direct"]').addEventListener("submit",e=>{
   e.preventDefault();
   try{
-    const v=values(e.target), x=parseN(v.x), y=parseN(v.y), rawDir=parseN(v.dir), d=parseN(v.dist);
+    const v=values(e.target);
+    const x=parseN(v.x);
+    const y=parseN(v.y);
+    const rawDir=parseN(v.dir);
+    const d=parseN(v.dist);
+
     if(d<0) throw new Error("A távolság nem lehet negatív.");
 
     const measureType = v.measureType || "target";
-    const dir = measureType === "known" ? normMil(rawDir + 3200) : normMil(rawDir);
+    const dir = measureType === "known"
+      ? normMil(rawDir + 3200)
+      : normMil(rawDir);
 
-    const u=vecFromMil(dir);
-    const px=x+d*u.x, py=y+d*u.y;
+    // FONTOS:
+    // X függőleges (észak), Y vízszintes (kelet).
+    // Ezért 1600 MIL esetén ΔY = +d és ΔX = 0.
+    const deltaX = d * Math.cos(rad(dir));
+    const deltaY = d * Math.sin(rad(dir));
+
+    const px = x + deltaX;
+    const py = y + deltaY;
 
     const title = measureType === "known" ? "Álláspont koordinátái" : "Cél koordinátái";
     const extra = measureType === "known"
       ? `<p class="hint">A megadott irányszög automatikusan 3200 MIL-lel meg lett fordítva: ${fmt(dir,2)} MIL.</p>`
       : "";
 
-    resultBox("direct",`<h3>${title}</h3><div class="coord-line"><strong>Y ${fmt(py)}</strong><strong>X ${fmt(px)}</strong></div>${extra}`);
+    resultBox("direct",
+      `<h3>${title}</h3>` +
+      `<div class="coord-line"><strong>Y ${fmt(py)}</strong><strong>X ${fmt(px)}</strong></div>` +
+      extra
+    );
   }catch(err){resultBox("direct",err.message,true)}
 });
 
@@ -92,7 +113,7 @@ $('[data-calc="oriented"]').addEventListener("submit",e=>{
     const BA={x:B.x-A.x,y:B.y-A.y};
     const t=cross(BA,w)/den;
     const P={x:A.x+t*u.x,y:A.y+t*u.y};
-    resultBox("oriented",`<h3>Álláspont koordinátái</h3>${grid([["X",fmt(P.x)],["Y",fmt(P.y)]])}`);
+    resultBox("oriented",`<h3>Álláspont koordinátái</h3>${grid([["Y",fmt(P.y)],["X",fmt(P.x)]])}`);
   }catch(err){resultBox("oriented",err.message,true)}
 });
 
@@ -116,8 +137,8 @@ $('[data-calc="arc"]').addEventListener("submit",e=>{
     const xm=A.x+a*dx/d, ym=A.y+a*dy/d;
     const rx=-dy*(h/d), ry=dx*(h/d);
     const P1={x:xm+rx,y:ym+ry}, P2={x:xm-rx,y:ym-ry};
-    let rows=[["1. megoldás X",fmt(P1.x)],["1. megoldás Y",fmt(P1.y)]];
-    if(h>1e-8) rows.push(["2. megoldás X",fmt(P2.x)],["2. megoldás Y",fmt(P2.y)]);
+    let rows=[["1. megoldás Y",fmt(P1.y)],["1. megoldás X",fmt(P1.x)]];
+    if(h>1e-8) rows.push(["2. megoldás Y",fmt(P2.y)],["2. megoldás X",fmt(P2.x)]);
     resultBox("arc",`<h3>${h>1e-8?"Két lehetséges álláspont":"Érintési pont"}</h3>${grid(rows)}${h>1e-8?'<p class="hint">A terepi helyzet alapján válaszd ki a helyes megoldást.</p>':''}`);
   }catch(err){resultBox("arc",err.message,true)}
 });
@@ -163,10 +184,10 @@ $('[data-calc="tienstra"]').addEventListener("submit",e=>{
     const warning=Math.abs(sumMeasured-FULL)>2
       ? `<p class="hint error">Figyelem: a megadott három állásponti szög összege ${fmt(sumMeasured,2)} MIL, nem 6400 MIL. Ellenőrizd a sorrendet/mérést.</p>`:"";
 
-    resultBox("tienstra",`<h3>Álláspont koordinátái</h3>${grid([["X",fmt(P.x)],["Y",fmt(P.y)]])}${warning}`);
+    resultBox("tienstra",`<h3>Álláspont koordinátái</h3>${grid([["Y",fmt(P.y)],["X",fmt(P.x)]])}${warning}`);
   }catch(err){resultBox("tienstra",err.message,true)}
 });
 
 if("serviceWorker" in navigator){
-  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+  window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js",{updateViaCache:"none"}).catch(()=>{}));
 }

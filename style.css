@@ -30,9 +30,8 @@ input:focus,select:focus{border-color:#9ca3af;background:#fff}
 .error{color:var(--danger)}.success{color:var(--ok)}
 .hint{color:var(--muted);font-size:13px;margin:-4px 0 8px}
 footer{text-align:center;color:var(--muted);font-size:11px;padding:0 15px calc(16px + env(safe-area-inset-bottom))}
+.coord-line{display:flex;align-items:center;gap:24px;flex-wrap:wrap;font-size:17px}
 @media(prefers-color-scheme:dark){
   :root{--bg:#0b0d10;--card:#15181d;--text:#f9fafb;--muted:#9ca3af;--line:#282d34;--accent:#f9fafb;--accentText:#111827}
   input,select{background:#fff;color:#000}.menu-icon,.badge{background:#20242a}.topbar{background:rgba(11,13,16,.88)}
 }
-
-.coord-line{display:flex;align-items:center;gap:24px;flex-wrap:wrap;font-size:17px}

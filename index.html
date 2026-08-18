@@ -10,7 +10,7 @@
   <title>Geodézia</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
   <header class="topbar">
@@ -28,30 +28,13 @@
         <h2>Koordináta-meghatározás</h2>
         <p>Válassz számítási módszert.</p>
       </div>
-
       <div class="menu-grid">
-        <button class="menu-card" data-open="reverse">
-          <span class="menu-icon">↔</span>
-          <span>Fordított geodéziai feladat</span>
-        </button>
-        <button class="menu-card" data-open="direct">
-          <span class="menu-icon">➜</span>
-          <span>Egyszerű geodéziai feladat</span>
-        </button>
-        <button class="menu-card" data-open="oriented">
-          <span class="menu-icon">⌖</span>
-          <span>Kétpontos tájolt metszés</span>
-        </button>
-        <button class="menu-card" data-open="arc">
-          <span class="menu-icon">◯</span>
-          <span>Ívmetszés</span>
-        </button>
-        <button class="menu-card" data-open="tienstra">
-          <span class="menu-icon">△</span>
-          <span>Hárompontos metszés</span>
-        </button>
+        <button class="menu-card" data-open="reverse"><span class="menu-icon">↔</span><span>Fordított geodéziai feladat</span></button>
+        <button class="menu-card" data-open="direct"><span class="menu-icon">➜</span><span>Egyszerű geodéziai feladat</span></button>
+        <button class="menu-card" data-open="oriented"><span class="menu-icon">⌖</span><span>Kétpontos tájolt metszés</span></button>
+        <button class="menu-card" data-open="arc"><span class="menu-icon">◯</span><span>Ívmetszés</span></button>
+        <button class="menu-card" data-open="tienstra"><span class="menu-icon">△</span><span>Hárompontos metszés</span></button>
       </div>
-
       <div class="info-card">
         <strong>Irányszög-konvenció</strong>
         <p>0 MIL = észak · 1600 = kelet · 3200 = dél · 4800 = nyugat</p>
@@ -60,20 +43,14 @@
 
     <section id="reverse" class="screen">
       <form data-calc="reverse">
-        <div class="card">
-          <h3>A pont</h3>
-          <div class="two-col">
-            <label>Y<input name="ay" inputmode="numeric" maxlength="5" placeholder="14230"></label>
-            <label>X<input name="ax" inputmode="numeric" maxlength="5" placeholder="86140"></label>
-          </div>
-        </div>
-        <div class="card">
-          <h3>B pont</h3>
-          <div class="two-col">
-            <label>Y<input name="by" inputmode="numeric" maxlength="5" placeholder="14685"></label>
-            <label>X<input name="bx" inputmode="numeric" maxlength="5" placeholder="90765"></label>
-          </div>
-        </div>
+        <div class="card"><h3>A pont</h3><div class="two-col">
+          <label>Y<input name="ay" inputmode="numeric" maxlength="5" placeholder="14230"></label>
+          <label>X<input name="ax" inputmode="numeric" maxlength="5" placeholder="86140"></label>
+        </div></div>
+        <div class="card"><h3>B pont</h3><div class="two-col">
+          <label>Y<input name="by" inputmode="numeric" maxlength="5" placeholder="14685"></label>
+          <label>X<input name="bx" inputmode="numeric" maxlength="5" placeholder="90765"></label>
+        </div></div>
         <button class="primary" type="submit">Számítás</button>
       </form>
       <div class="result" data-result="reverse"></div>
@@ -106,22 +83,14 @@
 
     <section id="oriented" class="screen">
       <form data-calc="oriented">
-        <div class="card">
-          <h3>A ismert pont</h3>
-          <div class="two-col">
-            <label>Y<input name="ay" inputmode="numeric" maxlength="5"></label>
-            <label>X<input name="ax" inputmode="numeric" maxlength="5"></label>
-          </div>
-          <label>P → A mért irányszög [MIL]<input name="dirA" inputmode="decimal"></label>
-        </div>
-        <div class="card">
-          <h3>B ismert pont</h3>
-          <div class="two-col">
-            <label>Y<input name="by" inputmode="numeric" maxlength="5"></label>
-            <label>X<input name="bx" inputmode="numeric" maxlength="5"></label>
-          </div>
-          <label>P → B mért irányszög [MIL]<input name="dirB" inputmode="decimal"></label>
-        </div>
+        <div class="card"><h3>A ismert pont</h3><div class="two-col">
+          <label>Y<input name="ay" inputmode="numeric" maxlength="5"></label>
+          <label>X<input name="ax" inputmode="numeric" maxlength="5"></label>
+        </div><label>P → A mért irányszög [MIL]<input name="dirA" inputmode="decimal"></label></div>
+        <div class="card"><h3>B ismert pont</h3><div class="two-col">
+          <label>Y<input name="by" inputmode="numeric" maxlength="5"></label>
+          <label>X<input name="bx" inputmode="numeric" maxlength="5"></label>
+        </div><label>P → B mért irányszög [MIL]<input name="dirB" inputmode="decimal"></label></div>
         <button class="primary" type="submit">Számítás</button>
       </form>
       <div class="result" data-result="oriented"></div>
@@ -129,22 +98,14 @@
 
     <section id="arc" class="screen">
       <form data-calc="arc">
-        <div class="card">
-          <h3>A ismert pont</h3>
-          <div class="two-col">
-            <label>Y<input name="ay" inputmode="numeric" maxlength="5"></label>
-            <label>X<input name="ax" inputmode="numeric" maxlength="5"></label>
-          </div>
-          <label>Távolság P–A [m]<input name="ra" inputmode="decimal"></label>
-        </div>
-        <div class="card">
-          <h3>B ismert pont</h3>
-          <div class="two-col">
-            <label>Y<input name="by" inputmode="numeric" maxlength="5"></label>
-            <label>X<input name="bx" inputmode="numeric" maxlength="5"></label>
-          </div>
-          <label>Távolság P–B [m]<input name="rb" inputmode="decimal"></label>
-        </div>
+        <div class="card"><h3>A ismert pont</h3><div class="two-col">
+          <label>Y<input name="ay" inputmode="numeric" maxlength="5"></label>
+          <label>X<input name="ax" inputmode="numeric" maxlength="5"></label>
+        </div><label>Távolság P–A [m]<input name="ra" inputmode="decimal"></label></div>
+        <div class="card"><h3>B ismert pont</h3><div class="two-col">
+          <label>Y<input name="by" inputmode="numeric" maxlength="5"></label>
+          <label>X<input name="bx" inputmode="numeric" maxlength="5"></label>
+        </div><label>Távolság P–B [m]<input name="rb" inputmode="decimal"></label></div>
         <button class="primary" type="submit">Számítás</button>
       </form>
       <div class="result" data-result="arc"></div>
@@ -152,8 +113,7 @@
 
     <section id="tienstra" class="screen">
       <form data-calc="tienstra">
-        <div class="card">
-          <h3>Ismert pontok</h3>
+        <div class="card"><h3>Ismert pontok</h3>
           <div class="point-row"><strong>A</strong><input name="ay" inputmode="numeric" maxlength="5" placeholder="Y"><input name="ax" inputmode="numeric" maxlength="5" placeholder="X"></div>
           <div class="point-row"><strong>B</strong><input name="by" inputmode="numeric" maxlength="5" placeholder="Y"><input name="bx" inputmode="numeric" maxlength="5" placeholder="X"></div>
           <div class="point-row"><strong>C</strong><input name="cy" inputmode="numeric" maxlength="5" placeholder="Y"><input name="cx" inputmode="numeric" maxlength="5" placeholder="X"></div>
@@ -172,6 +132,6 @@
   </main>
 
   <footer>Geodézia PWA · helyben számol, internet nélkül is használható</footer>
-  <script src="app.js"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
