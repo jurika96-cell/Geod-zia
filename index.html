@@ -63,15 +63,15 @@
         <div class="card">
           <h3>A pont</h3>
           <div class="two-col">
-            <label>X<input name="ax" inputmode="decimal" placeholder="86140"></label>
-            <label>Y<input name="ay" inputmode="decimal" placeholder="14230"></label>
+            <label>Y<input name="ay" inputmode="numeric" maxlength="5" placeholder="14230"></label>
+            <label>X<input name="ax" inputmode="numeric" maxlength="5" placeholder="86140"></label>
           </div>
         </div>
         <div class="card">
           <h3>B pont</h3>
           <div class="two-col">
-            <label>X<input name="bx" inputmode="decimal" placeholder="90765"></label>
-            <label>Y<input name="by" inputmode="decimal" placeholder="14685"></label>
+            <label>Y<input name="by" inputmode="numeric" maxlength="5" placeholder="14685"></label>
+            <label>X<input name="bx" inputmode="numeric" maxlength="5" placeholder="90765"></label>
           </div>
         </div>
         <button class="primary" type="submit">Számítás</button>
@@ -82,10 +82,10 @@
     <section id="direct" class="screen">
       <form data-calc="direct">
         <div class="card">
-          <h3>Álláspont</h3>
+          <h3>Álláspont/Ismert pont koordinátája</h3>
           <div class="two-col">
-            <label>X<input name="x" inputmode="decimal"></label>
-            <label>Y<input name="y" inputmode="decimal"></label>
+            <label>Y<input name="y" inputmode="numeric" maxlength="5"></label>
+            <label>X<input name="x" inputmode="numeric" maxlength="5"></label>
           </div>
         </div>
         <div class="card">
@@ -103,16 +103,16 @@
         <div class="card">
           <h3>A ismert pont</h3>
           <div class="two-col">
-            <label>X<input name="ax" inputmode="decimal"></label>
-            <label>Y<input name="ay" inputmode="decimal"></label>
+            <label>Y<input name="ay" inputmode="numeric" maxlength="5"></label>
+            <label>X<input name="ax" inputmode="numeric" maxlength="5"></label>
           </div>
           <label>P → A mért irányszög [MIL]<input name="dirA" inputmode="decimal"></label>
         </div>
         <div class="card">
           <h3>B ismert pont</h3>
           <div class="two-col">
-            <label>X<input name="bx" inputmode="decimal"></label>
-            <label>Y<input name="by" inputmode="decimal"></label>
+            <label>Y<input name="by" inputmode="numeric" maxlength="5"></label>
+            <label>X<input name="bx" inputmode="numeric" maxlength="5"></label>
           </div>
           <label>P → B mért irányszög [MIL]<input name="dirB" inputmode="decimal"></label>
         </div>
@@ -126,16 +126,16 @@
         <div class="card">
           <h3>A ismert pont</h3>
           <div class="two-col">
-            <label>X<input name="ax" inputmode="decimal"></label>
-            <label>Y<input name="ay" inputmode="decimal"></label>
+            <label>Y<input name="ay" inputmode="numeric" maxlength="5"></label>
+            <label>X<input name="ax" inputmode="numeric" maxlength="5"></label>
           </div>
           <label>Távolság P–A [m]<input name="ra" inputmode="decimal"></label>
         </div>
         <div class="card">
           <h3>B ismert pont</h3>
           <div class="two-col">
-            <label>X<input name="bx" inputmode="decimal"></label>
-            <label>Y<input name="by" inputmode="decimal"></label>
+            <label>Y<input name="by" inputmode="numeric" maxlength="5"></label>
+            <label>X<input name="bx" inputmode="numeric" maxlength="5"></label>
           </div>
           <label>Távolság P–B [m]<input name="rb" inputmode="decimal"></label>
         </div>
@@ -148,9 +148,9 @@
       <form data-calc="tienstra">
         <div class="card">
           <h3>Ismert pontok</h3>
-          <div class="point-row"><strong>A</strong><input name="ax" inputmode="decimal" placeholder="X"><input name="ay" inputmode="decimal" placeholder="Y"></div>
-          <div class="point-row"><strong>B</strong><input name="bx" inputmode="decimal" placeholder="X"><input name="by" inputmode="decimal" placeholder="Y"></div>
-          <div class="point-row"><strong>C</strong><input name="cx" inputmode="decimal" placeholder="X"><input name="cy" inputmode="decimal" placeholder="Y"></div>
+          <div class="point-row"><strong>A</strong><input name="ay" inputmode="numeric" maxlength="5" placeholder="Y"><input name="ax" inputmode="numeric" maxlength="5" placeholder="X"></div>
+          <div class="point-row"><strong>B</strong><input name="by" inputmode="numeric" maxlength="5" placeholder="Y"><input name="bx" inputmode="numeric" maxlength="5" placeholder="X"></div>
+          <div class="point-row"><strong>C</strong><input name="cy" inputmode="numeric" maxlength="5" placeholder="Y"><input name="cx" inputmode="numeric" maxlength="5" placeholder="X"></div>
         </div>
         <div class="card">
           <h3>P állásponton mért szögek</h3>
