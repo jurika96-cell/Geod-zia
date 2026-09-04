@@ -10,6 +10,11 @@ const parseN = v => {
   return n;
 };
 const fmt = (v,d=3) => Number(v).toLocaleString("hu-HU",{minimumFractionDigits:d,maximumFractionDigits:d,useGrouping:false});
+const fmtCoord = v => {
+  const n = Math.round(Number(v));
+  const sign = n < 0 ? "-" : "";
+  return sign + String(Math.abs(n)).padStart(5,"0");
+};
 const cross = (a,b) => a.x*b.y-a.y*b.x;
 
 // Geodéziai tengelykonvenció:
@@ -155,7 +160,7 @@ $('[data-calc="arc"]').addEventListener("submit",e=>{
 
     // Érintésnél csak egy metszéspont van, ezért nincs szükség jobb oldali választásra.
     if(h<=1e-8){
-      resultBox("arc",`<h3>Álláspont koordinátái</h3><div class="coord-line"><strong>Y ${fmt(P1.y)}</strong><strong>X ${fmt(P1.x)}</strong></div><p class="hint">A két kör egy pontban érinti egymást.</p>`);
+      resultBox("arc",`<h3>Álláspont koordinátája:</h3><div class="coord-line"><strong>${fmtCoord(P1.y)} ${fmtCoord(P1.x)}</strong></div><p class="hint">A két kör egy pontban érinti egymást.</p>`);
       return;
     }
 
@@ -169,8 +174,8 @@ $('[data-calc="arc"]').addEventListener("submit",e=>{
     const selectedP=rightAtP1===v.rightPoint?P1:P2;
 
     resultBox("arc",
-      `<h3>Álláspont koordinátái</h3>`+
-      `<div class="coord-line"><strong>Y ${fmt(selectedP.y)}</strong><strong>X ${fmt(selectedP.x)}</strong></div>`+
+      `<h3>Álláspont koordinátája:</h3>`+
+      `<div class="coord-line"><strong>${fmtCoord(selectedP.y)} ${fmtCoord(selectedP.x)}</strong></div>`+
       `<p class="hint">A helyes metszéspont kiválasztva: ${v.rightPoint} pont van jobb kéz felől.</p>`
     );
   }catch(err){resultBox("arc",err.message,true)}
