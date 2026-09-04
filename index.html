@@ -10,7 +10,7 @@
   <title>Geodézia</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
   <header class="topbar">
@@ -98,14 +98,23 @@
 
     <section id="arc" class="screen">
       <form data-calc="arc">
-        <div class="card"><h3>A ismert pont</h3><div class="two-col">
-          <label>Y<input name="ay" inputmode="numeric" maxlength="5"></label>
-          <label>X<input name="ax" inputmode="numeric" maxlength="5"></label>
-        </div><label>Távolság P–A [m]<input name="ra" inputmode="decimal"></label></div>
-        <div class="card"><h3>B ismert pont</h3><div class="two-col">
-          <label>Y<input name="by" inputmode="numeric" maxlength="5"></label>
-          <label>X<input name="bx" inputmode="numeric" maxlength="5"></label>
-        </div><label>Távolság P–B [m]<input name="rb" inputmode="decimal"></label></div>
+        <div class="card">
+          <div class="point-title-row"><h3>A ismert pont</h3><label class="right-point-choice"><input type="radio" name="rightPoint" value="A"> <span>Jobb oldali pont</span></label></div>
+          <div class="two-col">
+            <label>Y<input name="ay" inputmode="numeric" maxlength="5"></label>
+            <label>X<input name="ax" inputmode="numeric" maxlength="5"></label>
+          </div>
+          <label>Távolság P–A [m]<input name="ra" inputmode="decimal"></label>
+        </div>
+        <div class="card">
+          <div class="point-title-row"><h3>B ismert pont</h3><label class="right-point-choice"><input type="radio" name="rightPoint" value="B"> <span>Jobb oldali pont</span></label></div>
+          <div class="two-col">
+            <label>Y<input name="by" inputmode="numeric" maxlength="5"></label>
+            <label>X<input name="bx" inputmode="numeric" maxlength="5"></label>
+          </div>
+          <label>Távolság P–B [m]<input name="rb" inputmode="decimal"></label>
+        </div>
+        <p class="hint">Jelöld meg azt az ismert pontot, amelyik az álláspontból A és B közé nézve jobb kéz felől van. Egyszerre csak egy választható.</p>
         <button class="primary" type="submit">Számítás</button>
       </form>
       <div class="result" data-result="arc"></div>
@@ -132,6 +141,6 @@
   </main>
 
   <footer>Geodézia PWA · helyben számol, internet nélkül is használható</footer>
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>
