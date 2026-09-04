@@ -117,6 +117,18 @@ $('[data-calc="oriented"]').addEventListener("submit",e=>{
   }catch(err){resultBox("oriented",err.message,true)}
 });
 
+// Egy pont jobb/bal helyzete a P -> AB-felezőpont "előre" irányhoz képest.
+// A számításban x = észak, y = kelet. A szokásos (kelet, észak) síkon
+// negatív determináns jelenti azt, hogy a vizsgált pont jobbra van.
+function isPointRightOfForward(P, point, midpoint){
+  const forwardEast = midpoint.y - P.y;
+  const forwardNorth = midpoint.x - P.x;
+  const pointEast = point.y - P.y;
+  const pointNorth = point.x - P.x;
+  const det = forwardEast * pointNorth - forwardNorth * pointEast;
+  return det < 0;
+}
+
 // 4) Ívmetszés
 $('[data-calc="arc"]').addEventListener("submit",e=>{
   e.preventDefault();
@@ -125,21 +137,42 @@ $('[data-calc="arc"]').addEventListener("submit",e=>{
     const A={x:parseN(v.ax),y:parseN(v.ay)}, B={x:parseN(v.bx),y:parseN(v.by)};
     const r0=parseN(v.ra), r1=parseN(v.rb);
     if(r0<0||r1<0) throw new Error("A távolság nem lehet negatív.");
+
     const dx=B.x-A.x,dy=B.y-A.y,d=Math.hypot(dx,dy);
     if(d<1e-12) throw new Error("A két ismert pont nem lehet azonos.");
     if(d>r0+r1+1e-10) throw new Error("A két kör nem metszi egymást: a pontok túl messze vannak.");
     if(d<Math.abs(r0-r1)-1e-10) throw new Error("A két kör nem metszi egymást: az egyik kör a másik belsejében van.");
+
     const a=(r0*r0-r1*r1+d*d)/(2*d);
     let h2=r0*r0-a*a;
     if(h2<0 && h2>-1e-8) h2=0;
     if(h2<0) throw new Error("Nincs valós metszéspont.");
+
     const h=Math.sqrt(h2);
     const xm=A.x+a*dx/d, ym=A.y+a*dy/d;
     const rx=-dy*(h/d), ry=dx*(h/d);
     const P1={x:xm+rx,y:ym+ry}, P2={x:xm-rx,y:ym-ry};
-    let rows=[["1. megoldás Y",fmt(P1.y)],["1. megoldás X",fmt(P1.x)]];
-    if(h>1e-8) rows.push(["2. megoldás Y",fmt(P2.y)],["2. megoldás X",fmt(P2.x)]);
-    resultBox("arc",`<h3>${h>1e-8?"Két lehetséges álláspont":"Érintési pont"}</h3>${grid(rows)}${h>1e-8?'<p class="hint">A terepi helyzet alapján válaszd ki a helyes megoldást.</p>':''}`);
+
+    // Érintésnél csak egy metszéspont van, ezért nincs szükség jobb oldali választásra.
+    if(h<=1e-8){
+      resultBox("arc",`<h3>Álláspont koordinátái</h3><div class="coord-line"><strong>Y ${fmt(P1.y)}</strong><strong>X ${fmt(P1.x)}</strong></div><p class="hint">A két kör egy pontban érinti egymást.</p>`);
+      return;
+    }
+
+    if(v.rightPoint!=="A" && v.rightPoint!=="B"){
+      throw new Error("Jelöld meg, hogy az álláspontból nézve A vagy B ismert pont van jobb kéz felől.");
+    }
+
+    const midpoint={x:(A.x+B.x)/2,y:(A.y+B.y)/2};
+    const ARightAtP1=isPointRightOfForward(P1,A,midpoint);
+    const rightAtP1=ARightAtP1?"A":"B";
+    const selectedP=rightAtP1===v.rightPoint?P1:P2;
+
+    resultBox("arc",
+      `<h3>Álláspont koordinátái</h3>`+
+      `<div class="coord-line"><strong>Y ${fmt(selectedP.y)}</strong><strong>X ${fmt(selectedP.x)}</strong></div>`+
+      `<p class="hint">A helyes metszéspont kiválasztva: ${v.rightPoint} pont van jobb kéz felől.</p>`
+    );
   }catch(err){resultBox("arc",err.message,true)}
 });
 
