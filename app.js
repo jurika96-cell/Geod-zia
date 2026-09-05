@@ -118,7 +118,7 @@ $('[data-calc="oriented"]').addEventListener("submit",e=>{
     const BA={x:B.x-A.x,y:B.y-A.y};
     const t=cross(BA,w)/den;
     const P={x:A.x+t*u.x,y:A.y+t*u.y};
-    resultBox("oriented",`<h3>Álláspont koordinátái</h3>${grid([["Y",fmt(P.y)],["X",fmt(P.x)]])}`);
+    resultBox("oriented",`<h3>Álláspont koordinátája:</h3><div class="coord-line"><strong>${fmtCoord(P.y)} ${fmtCoord(P.x)}</strong></div>`);
   }catch(err){resultBox("oriented",err.message,true)}
 });
 
