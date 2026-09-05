@@ -17,9 +17,6 @@ const fmtCoord = v => {
 };
 const cross = (a,b) => a.x*b.y-a.y*b.x;
 
-// Geodéziai tengelykonvenció:
-// 0 MIL = +X (észak/felfelé)
-// 1600 MIL = +Y (kelet/jobbra)
 const vecFromMil = d => ({x:Math.cos(rad(d)), y:Math.sin(rad(d))});
 
 const titles = {
@@ -42,18 +39,13 @@ function openScreen(id){
 $$("[data-open]").forEach(b=>b.addEventListener("click",()=>openScreen(b.dataset.open)));
 $("#backBtn").addEventListener("click",()=>openScreen("home"));
 
-function values(form){
-  return Object.fromEntries(new FormData(form).entries());
-}
+function values(form){ return Object.fromEntries(new FormData(form).entries()); }
 function resultBox(name, html, isError=false){
   const box=$(`[data-result="${name}"]`);
   box.innerHTML=isError?`<div class="error"><strong>Hiba:</strong> ${html}</div>`:html;
 }
-function grid(rows){
-  return `<div class="result-grid">${rows.map(([a,b])=>`<span>${a}</span><strong>${b}</strong>`).join("")}</div>`;
-}
+function grid(rows){ return `<div class="result-grid">${rows.map(([a,b])=>`<span>${a}</span><strong>${b}</strong>`).join("")}</div>`; }
 
-// 1) Fordított geodéziai
 $('[data-calc="reverse"]').addEventListener("submit",e=>{
   e.preventDefault();
   try{
@@ -65,54 +57,29 @@ $('[data-calc="reverse"]').addEventListener("submit",e=>{
   }catch(err){resultBox("reverse",err.message,true)}
 });
 
-// 2) Egyszerű geodéziai
 $('[data-calc="direct"]').addEventListener("submit",e=>{
   e.preventDefault();
   try{
     const v=values(e.target);
-    const x=parseN(v.x);
-    const y=parseN(v.y);
-    const rawDir=parseN(v.dir);
-    const d=parseN(v.dist);
-
+    const x=parseN(v.x), y=parseN(v.y), rawDir=parseN(v.dir), d=parseN(v.dist);
     if(d<0) throw new Error("A távolság nem lehet negatív.");
-
-    const measureType = v.measureType || "target";
-    const dir = measureType === "known"
-      ? normMil(rawDir + 3200)
-      : normMil(rawDir);
-
-    // FONTOS:
-    // X függőleges (észak), Y vízszintes (kelet).
-    // Ezért 1600 MIL esetén ΔY = +d és ΔX = 0.
-    const deltaX = d * Math.cos(rad(dir));
-    const deltaY = d * Math.sin(rad(dir));
-
-    const px = x + deltaX;
-    const py = y + deltaY;
-
-    const title = measureType === "known" ? "Álláspont koordinátái" : "Cél koordinátái";
-    const extra = measureType === "known"
-      ? `<p class="hint">A megadott irányszög automatikusan 3200 MIL-lel meg lett fordítva: ${fmt(dir,2)} MIL.</p>`
-      : "";
-
-    resultBox("direct",
-      `<h3>${title}</h3>` +
-      `<div class="coord-line"><strong>Y ${fmt(py)}</strong><strong>X ${fmt(px)}</strong></div>` +
-      extra
-    );
+    const measureType=v.measureType||"target";
+    const dir=measureType==="known"?normMil(rawDir+3200):normMil(rawDir);
+    const deltaX=d*Math.cos(rad(dir)), deltaY=d*Math.sin(rad(dir));
+    const px=x+deltaX, py=y+deltaY;
+    const title=measureType==="known"?"Álláspont koordinátája:":"Cél koordinátája:";
+    const extra=measureType==="known"?`<p class="hint">A megadott irányszög automatikusan 3200 MIL-lel meg lett fordítva: ${fmt(dir,2)} MIL.</p>`:"";
+    resultBox("direct",`<h3>${title}</h3><div class="coord-line"><strong>${fmtCoord(py)} ${fmtCoord(px)}</strong></div>${extra}`);
   }catch(err){resultBox("direct",err.message,true)}
 });
 
-// 3) Kétpontos tájolt metszés
 $('[data-calc="oriented"]').addEventListener("submit",e=>{
   e.preventDefault();
   try{
     const v=values(e.target);
     const A={x:parseN(v.ax),y:parseN(v.ay)}, B={x:parseN(v.bx),y:parseN(v.by)};
     const pToA=parseN(v.dirA), pToB=parseN(v.dirB);
-    const u=vecFromMil(normMil(pToA+3200));
-    const w=vecFromMil(normMil(pToB+3200));
+    const u=vecFromMil(normMil(pToA+3200)), w=vecFromMil(normMil(pToB+3200));
     const den=cross(u,w);
     if(Math.abs(den)<1e-10) throw new Error("A két irány párhuzamos vagy közel párhuzamos; nincs stabil metszés.");
     const BA={x:B.x-A.x,y:B.y-A.y};
@@ -122,19 +89,12 @@ $('[data-calc="oriented"]').addEventListener("submit",e=>{
   }catch(err){resultBox("oriented",err.message,true)}
 });
 
-// Egy pont jobb/bal helyzete a P -> AB-felezőpont "előre" irányhoz képest.
-// A számításban x = észak, y = kelet. A szokásos (kelet, észak) síkon
-// negatív determináns jelenti azt, hogy a vizsgált pont jobbra van.
 function isPointRightOfForward(P, point, midpoint){
-  const forwardEast = midpoint.y - P.y;
-  const forwardNorth = midpoint.x - P.x;
-  const pointEast = point.y - P.y;
-  const pointNorth = point.x - P.x;
-  const det = forwardEast * pointNorth - forwardNorth * pointEast;
-  return det < 0;
+  const forwardEast=midpoint.y-P.y, forwardNorth=midpoint.x-P.x;
+  const pointEast=point.y-P.y, pointNorth=point.x-P.x;
+  return forwardEast*pointNorth-forwardNorth*pointEast<0;
 }
 
-// 4) Ívmetszés
 $('[data-calc="arc"]').addEventListener("submit",e=>{
   e.preventDefault();
   try{
@@ -142,42 +102,26 @@ $('[data-calc="arc"]').addEventListener("submit",e=>{
     const A={x:parseN(v.ax),y:parseN(v.ay)}, B={x:parseN(v.bx),y:parseN(v.by)};
     const r0=parseN(v.ra), r1=parseN(v.rb);
     if(r0<0||r1<0) throw new Error("A távolság nem lehet negatív.");
-
     const dx=B.x-A.x,dy=B.y-A.y,d=Math.hypot(dx,dy);
     if(d<1e-12) throw new Error("A két ismert pont nem lehet azonos.");
     if(d>r0+r1+1e-10) throw new Error("A két kör nem metszi egymást: a pontok túl messze vannak.");
     if(d<Math.abs(r0-r1)-1e-10) throw new Error("A két kör nem metszi egymást: az egyik kör a másik belsejében van.");
-
     const a=(r0*r0-r1*r1+d*d)/(2*d);
     let h2=r0*r0-a*a;
-    if(h2<0 && h2>-1e-8) h2=0;
+    if(h2<0&&h2>-1e-8) h2=0;
     if(h2<0) throw new Error("Nincs valós metszéspont.");
-
-    const h=Math.sqrt(h2);
-    const xm=A.x+a*dx/d, ym=A.y+a*dy/d;
+    const h=Math.sqrt(h2), xm=A.x+a*dx/d, ym=A.y+a*dy/d;
     const rx=-dy*(h/d), ry=dx*(h/d);
     const P1={x:xm+rx,y:ym+ry}, P2={x:xm-rx,y:ym-ry};
-
-    // Érintésnél csak egy metszéspont van, ezért nincs szükség jobb oldali választásra.
     if(h<=1e-8){
       resultBox("arc",`<h3>Álláspont koordinátája:</h3><div class="coord-line"><strong>${fmtCoord(P1.y)} ${fmtCoord(P1.x)}</strong></div><p class="hint">A két kör egy pontban érinti egymást.</p>`);
       return;
     }
-
-    if(v.rightPoint!=="A" && v.rightPoint!=="B"){
-      throw new Error("Jelöld meg, hogy az álláspontból nézve A vagy B ismert pont van jobb kéz felől.");
-    }
-
+    if(v.rightPoint!=="A"&&v.rightPoint!=="B") throw new Error("Jelöld meg, hogy az álláspontból nézve A vagy B ismert pont van jobb kéz felől.");
     const midpoint={x:(A.x+B.x)/2,y:(A.y+B.y)/2};
-    const ARightAtP1=isPointRightOfForward(P1,A,midpoint);
-    const rightAtP1=ARightAtP1?"A":"B";
+    const rightAtP1=isPointRightOfForward(P1,A,midpoint)?"A":"B";
     const selectedP=rightAtP1===v.rightPoint?P1:P2;
-
-    resultBox("arc",
-      `<h3>Álláspont koordinátája:</h3>`+
-      `<div class="coord-line"><strong>${fmtCoord(selectedP.y)} ${fmtCoord(selectedP.x)}</strong></div>`+
-      `<p class="hint">A helyes metszéspont kiválasztva: ${v.rightPoint} pont van jobb kéz felől.</p>`
-    );
+    resultBox("arc",`<h3>Álláspont koordinátája:</h3><div class="coord-line"><strong>${fmtCoord(selectedP.y)} ${fmtCoord(selectedP.x)}</strong></div><p class="hint">A helyes metszéspont kiválasztva: ${v.rightPoint} pont van jobb kéz felől.</p>`);
   }catch(err){resultBox("arc",err.message,true)}
 });
 
@@ -188,41 +132,24 @@ function angleAt(A,B,C){
   const c=Math.max(-1,Math.min(1,(u.x*v.x+u.y*v.y)/(nu*nv)));
   return Math.acos(c);
 }
-const cot = x => Math.cos(x)/Math.sin(x);
+const cot=x=>Math.cos(x)/Math.sin(x);
 
 $('[data-calc="tienstra"]').addEventListener("submit",e=>{
   e.preventDefault();
   try{
     const v=values(e.target);
-    const A={x:parseN(v.ax),y:parseN(v.ay)};
-    const B={x:parseN(v.bx),y:parseN(v.by)};
-    const C={x:parseN(v.cx),y:parseN(v.cy)};
+    const A={x:parseN(v.ax),y:parseN(v.ay)}, B={x:parseN(v.bx),y:parseN(v.by)}, C={x:parseN(v.cx),y:parseN(v.cy)};
     const alpha=rad(parseN(v.alpha)), beta=rad(parseN(v.beta)), gamma=rad(parseN(v.gamma));
     if(alpha<=0||beta<=0||gamma<=0) throw new Error("A mért szögeknek pozitívnak kell lenniük.");
-
-    const Aang=angleAt(A,B,C);
-    const Bang=angleAt(B,C,A);
-    const Cang=angleAt(C,A,B);
-
-    const d1=cot(Aang)-cot(alpha);
-    const d2=cot(Bang)-cot(beta);
-    const d3=cot(Cang)-cot(gamma);
+    const Aang=angleAt(A,B,C), Bang=angleAt(B,C,A), Cang=angleAt(C,A,B);
+    const d1=cot(Aang)-cot(alpha), d2=cot(Bang)-cot(beta), d3=cot(Cang)-cot(gamma);
     if([d1,d2,d3].some(x=>Math.abs(x)<1e-10)) throw new Error("Kritikus geometriai helyzet: a Tienstra-képlet egyik nevezője közel nulla.");
-
-    const K1=1/d1, K2=1/d2, K3=1/d3;
-    const sum=K1+K2+K3;
+    const K1=1/d1,K2=1/d2,K3=1/d3,sum=K1+K2+K3;
     if(Math.abs(sum)<1e-10) throw new Error("A geometria instabil; a súlyok összege közel nulla.");
-
-    const P={
-      x:(K1*A.x+K2*B.x+K3*C.x)/sum,
-      y:(K1*A.y+K2*B.y+K3*C.y)/sum
-    };
-
+    const P={x:(K1*A.x+K2*B.x+K3*C.x)/sum,y:(K1*A.y+K2*B.y+K3*C.y)/sum};
     const sumMeasured=(alpha+beta+gamma)*FULL/(2*Math.PI);
-    const warning=Math.abs(sumMeasured-FULL)>2
-      ? `<p class="hint error">Figyelem: a megadott három állásponti szög összege ${fmt(sumMeasured,2)} MIL, nem 6400 MIL. Ellenőrizd a sorrendet/mérést.</p>`:"";
-
-    resultBox("tienstra",`<h3>Álláspont koordinátái</h3>${grid([["Y",fmt(P.y)],["X",fmt(P.x)]])}${warning}`);
+    const warning=Math.abs(sumMeasured-FULL)>2?`<p class="hint error">Figyelem: a megadott három állásponti szög összege ${fmt(sumMeasured,2)} MIL, nem 6400 MIL. Ellenőrizd a sorrendet/mérést.</p>`:"";
+    resultBox("tienstra",`<h3>Álláspont koordinátája:</h3><div class="coord-line"><strong>${fmtCoord(P.y)} ${fmtCoord(P.x)}</strong></div>${warning}`);
   }catch(err){resultBox("tienstra",err.message,true)}
 });
 
